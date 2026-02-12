@@ -53,7 +53,7 @@ const TInp = ({ label, value, onChange, ph, wide }) => <div style={{ flex: wide 
   <input type="text" value={value} onChange={e => onChange(e.target.value)} placeholder={ph || ""} style={{ width: "100%", background: "#0c0c0c", border: "1px solid #252525", borderRadius: 6, color: "#e8e8e8", padding: "10px", fontSize: 14, fontFamily: "'Barlow Condensed',sans-serif", fontWeight: 600, outline: "none", boxSizing: "border-box" }} />
 </div>;
 
-export default function Dashboard() {
+export default function App() {
   const [name, setName] = useState("");
   const [pyBl, setPyBl] = useState("");
   const [buMed, setBuMed] = useState("67120");
