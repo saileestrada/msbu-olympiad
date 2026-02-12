@@ -71,6 +71,7 @@ export default function App() {
   const [t5t, setT5t] = useState("");
   const [t5h, setT5h] = useState("");
   const [t5p, setT5p] = useState("");
+  const [locked110, setLocked110] = useState(false);
 
   const QD = 20, CD = 31;
   const py = p(pyBl), med = p(buMed), day = Math.max(1, Math.min(31, Math.round(p(curDay))));
@@ -80,9 +81,9 @@ export default function App() {
   const d2q = Math.max(0, QD - day), d2c = Math.max(0, CD - day);
   const bvAt20 = day >= QD ? (t20 || wBV) : wBV;
   const p20v = adj > 0 ? bvAt20 / adj : 0;
-  const s110 = day >= QD ? (p20v >= 1.1 ? "Qualified" : "In Training") : (pct >= 1.1 ? "Qualified" : (q110 > 0 && wBV / q110 >= (day / QD) * 0.85 ? "On Pace" : "In Training"));
+  const s110 = locked110 ? "Qualified" : (day < QD && q110 > 0 && wBV / q110 >= (day / QD) * 0.85 ? "On Pace" : "In Training");
   const s120 = pct >= 1.2 ? "Qualified" : (c120 > 0 && wBV / c120 >= (day / CD) * 0.85 ? "On Pace" : "In Training");
-  const bonus = (s110 === "Qualified" && s120 === "Qualified") ? 1200 : (s110 === "Qualified" ? 700 : (s120 === "Qualified" ? 500 : 0));
+  const bonus = (locked110 && s120 === "Qualified") ? 1200 : (locked110 ? 700 : (s120 === "Qualified" ? 500 : 0));
   const g2q = Math.max(0, q110 - wBV), g2c = Math.max(0, c120 - wBV);
   const drQ = d2q > 0 ? g2q / d2q : (g2q > 0 ? Infinity : 0), drC = d2c > 0 ? g2c / d2c : (g2c > 0 ? Infinity : 0);
   const dAvg = day > 0 ? wBV / day : 0, pFin = dAvg * CD, p20proj = dAvg * QD;
@@ -141,6 +142,19 @@ export default function App() {
         <Inp label="Large Sale BV" value={lsBV} onChange={setLsBV} pre="$" />
         {day >= QD && <Inp label="BV as of Mar 20" value={bv20} onChange={setBv20} pre="$" />}
       </div>
+      <div style={{ display: "flex", alignItems: "center", gap: 12, marginTop: 10, padding: "10px 14px", background: locked110 ? "#1a2e1a" : "#141414", border: `1px solid ${locked110 ? "#52b78844" : "#252525"}`, borderRadius: 8, transition: "all .3s", cursor: "pointer" }} onClick={() => setLocked110(!locked110)}>
+        <div style={{ width: 20, height: 20, borderRadius: 4, border: `2px solid ${locked110 ? "#c9a227" : "#444"}`, background: locked110 ? "#c9a227" : "transparent", display: "flex", alignItems: "center", justifyContent: "center", transition: "all .2s", flexShrink: 0 }}>
+          {locked110 && <span style={{ color: "#0a0a0a", fontSize: 14, fontWeight: 900, lineHeight: 1 }}>{"\u2713"}</span>}
+        </div>
+        <div>
+          <div style={{ fontSize: 13, fontWeight: 700, color: locked110 ? "#c9a227" : "#EEEEEE", fontFamily: "'Barlow Condensed',sans-serif", textTransform: "uppercase", letterSpacing: 0.8 }}>
+            {locked110 ? "\u2605 110% Qualified by March 20 \u2014 Locked" : "Lock 110% Qualification (check when confirmed by March 20)"}
+          </div>
+          <div style={{ fontSize: 12, color: locked110 ? "#52b788" : "#666", marginTop: 2 }}>
+            {locked110 ? "Earning $700 bonus. Hit 120% by March 31 to earn $1,200 total." : "Only check this if you reached 110% of your Training Weight by March 20."}
+          </div>
+        </div>
+      </div>
       <div style={{ fontSize: 12, color: "#EEEEEE", marginTop: 6 }}>Working BV = Total BV minus Large Sale BV = <span style={{ color: "#666" }}>{fmt(wBV)}</span></div>
     </div>
 
@@ -154,7 +168,7 @@ export default function App() {
         <div style={{ display: "flex", gap: 10, flexWrap: "wrap", marginBottom: 14 }}>
           <Card label="Current Lift" value={fmt(wBV)} sub={`of ${fmt(adj)} baseline`} />
           <Card label="Performance Delta" value={fmtP(pct)} sub={pct >= 1 ? "Above baseline" : `${fmt(adj - wBV)} to go`} accent={pct >= 1 ? "#52b788" : "#c9a227"} />
-          <Card label="Bonus Potential" value={`$${bonus.toLocaleString()}`} sub={bonus >= 1200 ? "Full bonus earned" : bonus > 0 ? "Partial qualification" : "Keep pushing"} accent="#52b788" />
+          <Card label="Bonus Potential" value={`$${bonus.toLocaleString()}`} sub={bonus >= 1200 ? "110% + 120% — Full bonus earned" : bonus === 700 ? "110% locked — hit 120% for $1,200" : bonus === 500 ? "120% only — 110% not locked by Mar 20" : "No bonus qualification yet"} accent="#52b788" />
         </div>
         <div style={{ background: "#0e0e0e", border: "1px solid #252525", borderRadius: 10, padding: 16 }}>
           <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "5px 24px", fontSize: 14, fontFamily: "'Barlow Condensed',sans-serif", marginBottom: 14 }}>
