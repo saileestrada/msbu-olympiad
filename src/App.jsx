@@ -127,9 +127,9 @@ export default function App() {
         <Inp label="Current Day of March (1-31)" value={curDay} onChange={setCurDay} />
       </div>
       <div style={{ marginTop: 8, padding: "8px 12px", background: "#141414", borderRadius: 6, display: "flex", gap: 20, flexWrap: "wrap", fontSize: 14, fontFamily: "'Barlow Condensed',sans-serif" }}>
-        <span style={{ color: "#EEEEEE" }}>Training Weight: <span style={{ color: "#c9a227", fontWeight: 700 }}>{fmt(adj)}</span></span>
-        <span style={{ color: "#EEEEEE" }}>Qualifying Round (110%): <span style={{ color: "#EEEEEE", fontWeight: 600 }}>{fmt(q110)}</span></span>
-        <span style={{ color: "#EEEEEE" }}>Championship Round (120%): <span style={{ color: "#EEEEEE", fontWeight: 600 }}>{fmt(c120)}</span></span>
+        <span style={{ color: "#EEEEEE" }}>Qualifying Weight: <span style={{ color: "#c9a227", fontWeight: 700 }}>{fmt(adj)}</span></span>
+        <span style={{ color: "#EEEEEE" }}>Elite Qualifier (110%): <span style={{ color: "#EEEEEE", fontWeight: 600 }}>{fmt(q110)}</span></span>
+        <span style={{ color: "#EEEEEE" }}>Championship Qualifier (120%): <span style={{ color: "#EEEEEE", fontWeight: 600 }}>{fmt(c120)}</span></span>
       </div>
     </div>
 
@@ -174,9 +174,9 @@ export default function App() {
           <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "5px 24px", fontSize: 14, fontFamily: "'Barlow Condensed',sans-serif", marginBottom: 14 }}>
             <span style={{ color: "#EEEEEE" }}>PY Production</span><span style={{ color: "#EEEEEE", fontWeight: 600 }}>{fmt(py)}</span>
             <span style={{ color: "#EEEEEE" }}>BU Median Floor</span><span style={{ color: "#EEEEEE", fontWeight: 600 }}>{fmt(med)}</span>
-            <span style={{ color: "#c9a227" }}>Training Weight</span><span style={{ color: "#c9a227", fontWeight: 700 }}>{fmt(adj)}</span>
-            <span style={{ color: "#EEEEEE" }}>Qualifying Round (110%)</span><span style={{ color: "#EEEEEE", fontWeight: 600 }}>{fmt(q110)}</span>
-            <span style={{ color: "#EEEEEE" }}>Championship Round (120%)</span><span style={{ color: "#EEEEEE", fontWeight: 600 }}>{fmt(c120)}</span>
+            <span style={{ color: "#c9a227" }}>Qualifying Weight</span><span style={{ color: "#c9a227", fontWeight: 700 }}>{fmt(adj)}</span>
+            <span style={{ color: "#EEEEEE" }}>Elite Qualifier (110%)</span><span style={{ color: "#EEEEEE", fontWeight: 600 }}>{fmt(q110)}</span>
+            <span style={{ color: "#EEEEEE" }}>Championship Qualifier (120%)</span><span style={{ color: "#EEEEEE", fontWeight: 600 }}>{fmt(c120)}</span>
           </div>
           <Bar cur={wBV} tgt={c120} label="Progress to Championship Round" color="#52b788" marker={c120 > 0 ? q110 / c120 : 0} />
           <Bar cur={tH} tgt={py > 0 ? py * 0.4 : med * 0.3} label="Heritage BV" color="#6c8ebf" />
@@ -186,9 +186,9 @@ export default function App() {
 
       <Sec id="minimum" icon={"\uD83D\uDD01"} title="Daily Reps" sub="What it takes from here to qualify">
         <div style={{ display: "flex", gap: 10, flexWrap: "wrap", marginBottom: 14 }}>
-          <Card label="Gain to Qualifying (110%)" value={fmt(g2q)} sub={g2q <= 0 ? "Target reached" : `${d2q} days remaining`} accent={g2q <= 0 ? "#52b788" : "#c9a227"} />
+          <Card label="Gain to Elite Qualifier (110%)" value={fmt(g2q)} sub={g2q <= 0 ? "Target reached" : `${d2q} days remaining`} accent={g2q <= 0 ? "#52b788" : "#c9a227"} />
           <Card label="Daily Reps to Qualify" value={drQ === Infinity ? "\u2014" : fmt(drQ)} sub={d2q <= 0 ? "Qualifying Day passed" : "per day through Mar 20"} accent="#52b788" />
-          <Card label="Gain to Championship (120%)" value={fmt(g2c)} sub={g2c <= 0 ? "#52b788" : `${d2c} days remaining`} accent={g2c <= 0 ? "#52b788" : "#c9a227"} />
+          <Card label="Gain to Championship Qualifier (120%)" value={fmt(g2c)} sub={g2c <= 0 ? "#52b788" : `${d2c} days remaining`} accent={g2c <= 0 ? "#52b788" : "#c9a227"} />
           <Card label="Daily Reps to Championship" value={drC === Infinity ? "\u2014" : fmt(drC)} sub={d2c <= 0 ? "Championship Day passed" : "per day through Mar 31"} accent="#52b788" />
         </div>
         <div style={{ background: "#0e0e0e", border: "1px solid #252525", borderRadius: 10, padding: 16 }}>
