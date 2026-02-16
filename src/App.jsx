@@ -1,57 +1,108 @@
-import { useState } from "react";
+import { useState, useMemo } from "react";
 
 const fmt = v => v == null || isNaN(v) || v === "" ? "$0" : (v < 0 ? "-" : "") + "$" + Math.abs(Math.round(v)).toLocaleString("en-US");
 const fmtP = v => v == null || isNaN(v) ? "0.0%" : (v * 100).toFixed(1) + "%";
 const cl = (v, a, b) => Math.max(a, Math.min(b, v));
 const p = v => parseFloat(v) || 0;
 
-const Badge = ({ s }) => {
+/* ── Motivational Quotes ─────────────────────────────────────────────── */
+
+const QUOTES = [
+  "The difference between ordinary and extraordinary is that little extra.",
+  "Champions aren't made in the ring. They're made in the hours before.",
+  "You don't have to be great to start, but you have to start to be great.",
+  "Success is the sum of small efforts repeated day in and day out.",
+  "The only limit to our realization of tomorrow is our doubts of today.",
+  "Hard work beats talent when talent doesn't work hard.",
+  "Don't count the days. Make the days count.",
+  "Every rep counts. Every call matters. Every day is a chance to close the gap.",
+  "The scoreboard doesn't care about your excuses. Show up and produce.",
+  "Pressure is a privilege. It means you're in the arena.",
+  "Discipline is choosing between what you want now and what you want most.",
+  "Your competition is training right now. What are you doing?",
+  "Elite is not a talent level. It's a mindset.",
+  "The pain of discipline weighs ounces. The pain of regret weighs tons.",
+  "You are one presentation away from changing your month.",
+  "Comfort zones are where ambition goes to die. Get uncomfortable.",
+  "Nobody remembers second place in March. Push for the podium.",
+  "Small daily improvements are the key to staggering long-term results.",
+  "The best time to plant a tree was 20 years ago. The second best time is now.",
+  "What you do today determines where you'll be tomorrow.",
+];
+
+/* ── Shared Components ───────────────────────────────────────────────── */
+
+const BC = "'Barlow Condensed',sans-serif";
+const DM = "'DM Sans',sans-serif";
+
+const Badge = ({ label, s }) => {
   const C = { Qualified: { bg: "linear-gradient(135deg,#c9a227,#e8d374)", c: "#1a1207", ic: "\u2605" }, "On Pace": { bg: "linear-gradient(135deg,#2d6a4f,#52b788)", c: "#f0fff4", ic: "\u25B2" }, "In Training": { bg: "linear-gradient(135deg,#6b3a2a,#c97b4b)", c: "#fff5ee", ic: "\u25C6" } }[s] || { bg: "#333", c: "#aaa", ic: "?" };
-  return <span style={{ display: "inline-flex", alignItems: "center", gap: 5, background: C.bg, color: C.c, padding: "5px 14px", borderRadius: 6, fontSize: 12, fontWeight: 700, letterSpacing: 0.5, fontFamily: "'Barlow Condensed',sans-serif", textTransform: "uppercase" }}><span style={{ fontSize: 11 }}>{C.ic}</span>{s}</span>;
+  return <div style={{ display: "inline-flex", flexDirection: "column", alignItems: "center", gap: 3 }}>
+    {label && <div style={{ fontSize: 9, color: "#666", fontFamily: BC, textTransform: "uppercase", letterSpacing: 1 }}>{label}</div>}
+    <span style={{ display: "inline-flex", alignItems: "center", gap: 5, background: C.bg, color: C.c, padding: "6px 14px", borderRadius: 6, fontSize: 13, fontWeight: 700, letterSpacing: 0.5, fontFamily: BC, textTransform: "uppercase" }}><span style={{ fontSize: 12 }}>{C.ic}</span>{s}</span>
+  </div>;
 };
 
 const Bar = ({ cur, tgt, label, color = "#c9a227", marker }) => {
   const pct = tgt > 0 ? cl(cur / tgt, 0, 1.35) : 0;
-  return <div style={{ marginBottom: 10 }}>
-    {label && <div style={{ display: "flex", justifyContent: "space-between", marginBottom: 4, fontSize: 13, color: "#EEEEEE", fontFamily: "'Barlow Condensed',sans-serif", textTransform: "uppercase", letterSpacing: 1 }}><span>{label}</span><span>{(pct * 100).toFixed(1)}%</span></div>}
-    <div style={{ position: "relative", height: 10, background: "#1a1a1a", borderRadius: 5 }}>
-      <div style={{ width: `${Math.min(pct, 1) * 100}%`, height: "100%", borderRadius: 5, background: pct >= 1 ? "linear-gradient(90deg,#c9a227,#e8d374)" : `linear-gradient(90deg,${color}55,${color})`, transition: "width .7s cubic-bezier(.4,0,.2,1)", boxShadow: pct >= 1 ? "0 0 12px #c9a22744" : "none" }} />
-      {marker != null && <div style={{ position: "absolute", left: `${cl(marker, 0, 1) * 100}%`, top: -2, width: 2, height: 14, background: "#fff5", borderRadius: 1 }} />}
+  return <div style={{ marginBottom: 12 }}>
+    {label && <div style={{ display: "flex", justifyContent: "space-between", marginBottom: 5, fontSize: 13, color: "#ccc", fontFamily: BC, textTransform: "uppercase", letterSpacing: 1 }}><span>{label}</span><span style={{ color: "#e8e8e8", fontWeight: 600 }}>{(pct * 100).toFixed(1)}%</span></div>}
+    <div style={{ position: "relative", height: 12, background: "#1a1a1a", borderRadius: 6 }}>
+      <div style={{ width: `${Math.min(pct, 1) * 100}%`, height: "100%", borderRadius: 6, background: pct >= 1 ? "linear-gradient(90deg,#c9a227,#e8d374)" : `linear-gradient(90deg,${color}55,${color})`, transition: "width .7s cubic-bezier(.4,0,.2,1)", boxShadow: pct >= 1 ? "0 0 12px #c9a22744" : "none" }} />
+      {marker != null && <div style={{ position: "absolute", left: `${cl(marker, 0, 1) * 100}%`, top: -2, width: 2, height: 16, background: "#fff5", borderRadius: 1 }} />}
     </div>
   </div>;
 };
 
-const Card = ({ label, value, sub, accent }) => <div style={{ background: "#141414", border: "1px solid #252525", borderRadius: 10, padding: "14px 16px", flex: "1 1 155px", minWidth: 155 }}>
-  <div style={{ fontSize: 12, color: "#EEEEEE", fontFamily: "'Barlow Condensed',sans-serif", textTransform: "uppercase", letterSpacing: 1.2, marginBottom: 5 }}>{label}</div>
-  <div style={{ fontSize: 24, fontWeight: 800, color: accent || "#e8e8e8", fontFamily: "'Barlow Condensed',sans-serif", lineHeight: 1.1 }}>{value}</div>
-  {sub && <div style={{ fontSize: 13, color: "#EEEEEE", marginTop: 4 }}>{sub}</div>}
+const Card = ({ label, value, sub, accent }) => <div style={{ background: "#111", border: "1px solid #252525", borderRadius: 10, padding: "16px 18px", flex: "1 1 160px", minWidth: 160 }}>
+  <div style={{ fontSize: 12, color: "#bbb", fontFamily: BC, textTransform: "uppercase", letterSpacing: 1.2, marginBottom: 6 }}>{label}</div>
+  <div style={{ fontSize: 26, fontWeight: 800, color: accent || "#e8e8e8", fontFamily: BC, lineHeight: 1.1 }}>{value}</div>
+  {sub && <div style={{ fontSize: 13, color: "#aaa", marginTop: 5 }}>{sub}</div>}
 </div>;
 
-const Sec = ({ id, icon, title, sub, children }) => <section id={id} style={{ marginBottom: 36, scrollMarginTop: 80 }}>
+const Sec = ({ icon, title, sub, children }) => <div style={{ marginBottom: 28 }}>
   <div style={{ marginBottom: 14 }}>
     <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 3 }}>
       <span style={{ fontSize: 18 }}>{icon}</span>
-      <span style={{ fontSize: 18, fontWeight: 800, color: "#e8e8e8", fontFamily: "'Barlow Condensed',sans-serif", textTransform: "uppercase", letterSpacing: 1.5 }}>{title}</span>
+      <span style={{ fontSize: 20, fontWeight: 800, color: "#e8e8e8", fontFamily: BC, textTransform: "uppercase", letterSpacing: 1.5 }}>{title}</span>
     </div>
-    {sub && <div style={{ fontSize: 14, color: "#EEEEEE", paddingLeft: 26 }}>{sub}</div>}
+    {sub && <div style={{ fontSize: 14, color: "#aaa", paddingLeft: 26 }}>{sub}</div>}
     <div style={{ height: 1, background: "linear-gradient(90deg,#c9a22744,transparent)", marginTop: 8 }} />
   </div>
   {children}
-</section>;
+</div>;
 
-const Inp = ({ label, value, onChange, ph, suf, pre }) => <div style={{ flex: "1 1 130px", minWidth: 120 }}>
-  <label style={{ display: "block", fontSize: 12, color: "#EEEEEE", fontFamily: "'Barlow Condensed',sans-serif", textTransform: "uppercase", letterSpacing: 1.2, marginBottom: 3 }}>{label}</label>
-  <div style={{ display: "flex", alignItems: "center", background: "#0c0c0c", border: "1px solid #252525", borderRadius: 6, overflow: "hidden" }}>
-    {pre && <span style={{ padding: "0 0 0 10px", color: "#EEEEEE", fontSize: 14, fontFamily: "'Barlow Condensed',sans-serif" }}>{pre}</span>}
-    <input type="number" value={value} onChange={e => onChange(e.target.value)} placeholder={ph || "0"} style={{ flex: 1, background: "transparent", border: "none", color: "#e8e8e8", padding: "10px 10px", fontSize: 15, fontFamily: "'Barlow Condensed',sans-serif", fontWeight: 600, outline: "none", MozAppearance: "textfield", WebkitAppearance: "none", width: "100%" }} />
-    {suf && <span style={{ padding: "0 10px 0 0", color: "#EEEEEE", fontSize: 11, fontFamily: "'Barlow Condensed',sans-serif" }}>{suf}</span>}
+/* ── Input Components ────────────────────────────────────────────────── */
+
+const Field = ({ label, value, onChange, ph, pre, suf }) => (
+  <div style={{ flex: "1 1 140px", minWidth: 130 }}>
+    <label style={{ display: "block", fontSize: 11, color: "#aaa", fontFamily: BC, textTransform: "uppercase", letterSpacing: 1.2, marginBottom: 5, fontWeight: 600 }}>{label}</label>
+    <div style={{ display: "flex", alignItems: "center", background: "#111", border: "2px solid #333", borderRadius: 8, overflow: "hidden", transition: "border-color .2s" }}
+      onFocus={e => e.currentTarget.style.borderColor = "#c9a227"}
+      onBlur={e => e.currentTarget.style.borderColor = "#333"}>
+      {pre && <span style={{ padding: "0 0 0 12px", color: "#999", fontSize: 16, fontFamily: BC, fontWeight: 700 }}>{pre}</span>}
+      <input type="number" value={value} onChange={e => onChange(e.target.value)} placeholder={ph || "0"}
+        style={{ flex: 1, background: "transparent", border: "none", color: "#fff", padding: "12px 12px", fontSize: 18, fontFamily: BC, fontWeight: 700, outline: "none", MozAppearance: "textfield", WebkitAppearance: "none", width: "100%" }} />
+      {suf && <span style={{ padding: "0 12px 0 0", color: "#999", fontSize: 13, fontFamily: BC }}>{suf}</span>}
+    </div>
   </div>
-</div>;
+);
 
-const TInp = ({ label, value, onChange, ph, wide }) => <div style={{ flex: wide ? "1 1 240px" : "1 1 160px", minWidth: wide ? 200 : 140 }}>
-  <label style={{ display: "block", fontSize: 12, color: "#EEEEEE", fontFamily: "'Barlow Condensed',sans-serif", textTransform: "uppercase", letterSpacing: 1.2, marginBottom: 3 }}>{label}</label>
-  <input type="text" value={value} onChange={e => onChange(e.target.value)} placeholder={ph || ""} style={{ width: "100%", background: "#0c0c0c", border: "1px solid #252525", borderRadius: 6, color: "#e8e8e8", padding: "10px", fontSize: 14, fontFamily: "'Barlow Condensed',sans-serif", fontWeight: 600, outline: "none", boxSizing: "border-box" }} />
-</div>;
+const TextField = ({ label, value, onChange, ph }) => (
+  <div style={{ flex: "1 1 200px", minWidth: 180 }}>
+    <label style={{ display: "block", fontSize: 11, color: "#aaa", fontFamily: BC, textTransform: "uppercase", letterSpacing: 1.2, marginBottom: 5, fontWeight: 600 }}>{label}</label>
+    <input type="text" value={value} onChange={e => onChange(e.target.value)} placeholder={ph || ""}
+      style={{ width: "100%", background: "#111", border: "2px solid #333", borderRadius: 8, color: "#fff", padding: "12px", fontSize: 17, fontFamily: BC, fontWeight: 700, outline: "none", boxSizing: "border-box", transition: "border-color .2s" }}
+      onFocus={e => e.target.style.borderColor = "#c9a227"}
+      onBlur={e => e.target.style.borderColor = "#333"} />
+  </div>
+);
+
+const GroupLabel = ({ children }) => (
+  <div style={{ fontSize: 11, color: "#666", fontFamily: BC, textTransform: "uppercase", letterSpacing: 1.5, marginBottom: 8, marginTop: 18, fontWeight: 700, borderBottom: "1px solid #1a1a1a", paddingBottom: 5 }}>{children}</div>
+);
+
+/* ── Main App ────────────────────────────────────────────────────────── */
 
 export default function App() {
   const [name, setName] = useState("");
@@ -72,20 +123,25 @@ export default function App() {
   const [t5h, setT5h] = useState("");
   const [t5p, setT5p] = useState("");
   const [locked110, setLocked110] = useState(false);
+  const [panelOpen, setPanelOpen] = useState(true);
 
+  const quote = useMemo(() => QUOTES[Math.floor(Math.random() * QUOTES.length)], []);
+
+  /* ── Calculations ──────────────────────────────────────────────────── */
   const QD = 20, CD = 31;
   const py = p(pyBl), med = p(buMed), day = Math.max(1, Math.min(31, Math.round(p(curDay))));
   const adj = Math.max(py, med), q110 = adj * 1.1, c120 = adj * 1.2;
   const tBV = p(totalBV), tH = p(hBV), tP = p(pBV), tLS = p(lsBV), t20 = p(bv20);
   const wBV = tBV - tLS, pct = adj > 0 ? wBV / adj : 0;
   const d2q = Math.max(0, QD - day), d2c = Math.max(0, CD - day);
-  const bvAt20 = day >= QD ? (t20 || wBV) : wBV;
-  const p20v = adj > 0 ? bvAt20 / adj : 0;
+
   const s110 = locked110 ? "Qualified" : (day < QD && q110 > 0 && wBV / q110 >= (day / QD) * 0.85 ? "On Pace" : "In Training");
   const s120 = pct >= 1.2 ? "Qualified" : (c120 > 0 && wBV / c120 >= (day / CD) * 0.85 ? "On Pace" : "In Training");
   const bonus = (locked110 && s120 === "Qualified") ? 1200 : (locked110 ? 700 : (s120 === "Qualified" ? 500 : 0));
+
   const g2q = Math.max(0, q110 - wBV), g2c = Math.max(0, c120 - wBV);
-  const drQ = d2q > 0 ? g2q / d2q : (g2q > 0 ? Infinity : 0), drC = d2c > 0 ? g2c / d2c : (g2c > 0 ? Infinity : 0);
+  const drQ = d2q > 0 ? g2q / d2q : (g2q > 0 ? Infinity : 0);
+  const drC = d2c > 0 ? g2c / d2c : (g2c > 0 ? Infinity : 0);
   const dAvg = day > 0 ? wBV / day : 0, pFin = dAvg * CD, p20proj = dAvg * QD;
 
   const nA = p(acts), nAp = p(appts), nPr = p(pres), nPS = p(presSale), nAcv = p(acv);
@@ -98,178 +154,256 @@ export default function App() {
   const cPt = gPt > 0 ? Math.ceil(gPt / aCV) : 0, cPh = gPh > 0 ? Math.ceil(gPh / aCV) : 0, cPp = gPp > 0 ? Math.ceil(gPp / aCV) : 0;
   const prPt = cPt > 0 ? Math.ceil(cPt / cr) : 0, prPh = cPh > 0 ? Math.ceil(cPh / cr) : 0, prPp = cPp > 0 ? Math.ceil(cPp / cr) : 0;
 
-  const nav = [{ id: "position", l: "Current Lift", ic: "\u2B06" }, { id: "minimum", l: "Daily Reps", ic: "\uD83D\uDD01" }, { id: "training", l: "Training Log", ic: "\uD83D\uDCCB" }, { id: "podium", l: "Podium Push", ic: "\uD83C\uDFC5" }];
+  /* ── Render ────────────────────────────────────────────────────────── */
+  return <div style={{ minHeight: "100vh", background: "#0a0a0a", color: "#e8e8e8", fontFamily: DM }}>
+    <style>{`@import url('https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@400;600;700;800&family=DM+Sans:wght@400;500;600&display=swap');*{box-sizing:border-box;margin:0;padding:0}input[type=number]::-webkit-inner-spin-button,input[type=number]::-webkit-outer-spin-button{-webkit-appearance:none}input[type=number]{-moz-appearance:textfield}::selection{background:#c9a22744}::-webkit-scrollbar{width:6px}::-webkit-scrollbar-track{background:#0a0a0a}::-webkit-scrollbar-thumb{background:#252525;border-radius:3px}@media(max-width:900px){.olympiad-layout{flex-direction:column!important}.olympiad-left{position:static!important;width:100%!important;max-height:none!important;max-width:100%!important}}`}</style>
 
-  return <div style={{ minHeight: "100vh", background: "#0a0a0a", color: "#e8e8e8", fontFamily: "'DM Sans',sans-serif" }}>
-    <style>{`@import url('https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@400;600;700;800&family=DM+Sans:wght@400;500;600&display=swap');*{box-sizing:border-box;margin:0;padding:0}input[type=number]::-webkit-inner-spin-button,input[type=number]::-webkit-outer-spin-button{-webkit-appearance:none}input[type=number]{-moz-appearance:textfield}::selection{background:#c9a22744}::-webkit-scrollbar{width:6px}::-webkit-scrollbar-track{background:#0a0a0a}::-webkit-scrollbar-thumb{background:#252525;border-radius:3px}`}</style>
-
-    <header style={{ position: "sticky", top: 0, zIndex: 100, background: "#0a0a0aee", backdropFilter: "blur(14px)", borderBottom: "1px solid #1a1a1a", padding: "10px 20px", display: "flex", alignItems: "center", justifyContent: "space-between", flexWrap: "wrap", gap: 10 }}>
+    {/* ── Header ───────────────────────────────────────────────────────── */}
+    <header style={{ background: "#0a0a0aee", backdropFilter: "blur(14px)", borderBottom: "1px solid #1a1a1a", padding: "12px 24px", display: "flex", alignItems: "center", justifyContent: "space-between", flexWrap: "wrap", gap: 10 }}>
       <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
-        <div style={{ width: 36, height: 36, borderRadius: 8, background: "linear-gradient(135deg,#c9a227,#8b6914)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 18, fontWeight: 900, fontFamily: "'Barlow Condensed',sans-serif", color: "#0a0a0a" }}>M</div>
-        <div><div style={{ fontSize: 15, fontWeight: 800, fontFamily: "'Barlow Condensed',sans-serif", textTransform: "uppercase", letterSpacing: 2 }}>MSBU March Olympiad</div><div style={{ fontSize: 12, color: "#EEEEEE", fontFamily: "'Barlow Condensed',sans-serif", letterSpacing: 1 }}>PERFORMANCE INTELLIGENCE DASHBOARD</div></div>
+        <div style={{ width: 40, height: 40, borderRadius: 8, background: "linear-gradient(135deg,#c9a227,#8b6914)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 20, fontWeight: 900, fontFamily: BC, color: "#0a0a0a" }}>M</div>
+        <div>
+          <div style={{ fontSize: 17, fontWeight: 800, fontFamily: BC, textTransform: "uppercase", letterSpacing: 2 }}>MSBU March Olympiad</div>
+          <div style={{ fontSize: 11, color: "#666", fontFamily: BC, letterSpacing: 1 }}>PERFORMANCE INTELLIGENCE DASHBOARD</div>
+        </div>
       </div>
-      <div style={{ display: "flex", gap: 14, alignItems: "center" }}>
-        <div style={{ textAlign: "center" }}><div style={{ fontSize: 22, fontWeight: 800, fontFamily: "'Barlow Condensed',sans-serif", color: d2q <= 3 && d2q > 0 ? "#e74c3c" : "#c9a227" }}>{d2q}</div><div style={{ fontSize: 8, color: "#EEEEEE", fontFamily: "'Barlow Condensed',sans-serif", textTransform: "uppercase", letterSpacing: 1 }}>to Qualifying</div></div>
-        <div style={{ width: 1, height: 28, background: "#252525" }} />
-        <div style={{ textAlign: "center" }}><div style={{ fontSize: 22, fontWeight: 800, fontFamily: "'Barlow Condensed',sans-serif", color: d2c <= 5 && d2c > 0 ? "#e74c3c" : "#52b788" }}>{d2c}</div><div style={{ fontSize: 8, color: "#EEEEEE", fontFamily: "'Barlow Condensed',sans-serif", textTransform: "uppercase", letterSpacing: 1 }}>to Championship</div></div>
+      <div style={{ display: "flex", gap: 16, alignItems: "center" }}>
+        <div style={{ textAlign: "center" }}>
+          <div style={{ fontSize: 26, fontWeight: 800, fontFamily: BC, color: d2q <= 3 && d2q > 0 ? "#e74c3c" : "#c9a227" }}>{d2q}</div>
+          <div style={{ fontSize: 9, color: "#666", fontFamily: BC, textTransform: "uppercase", letterSpacing: 1 }}>to Elite Qualifier</div>
+        </div>
+        <div style={{ width: 1, height: 32, background: "#252525" }} />
+        <div style={{ textAlign: "center" }}>
+          <div style={{ fontSize: 26, fontWeight: 800, fontFamily: BC, color: d2c <= 5 && d2c > 0 ? "#e74c3c" : "#52b788" }}>{d2c}</div>
+          <div style={{ fontSize: 9, color: "#666", fontFamily: BC, textTransform: "uppercase", letterSpacing: 1 }}>to Championship</div>
+        </div>
       </div>
-      <nav style={{ display: "flex", gap: 3 }}>{nav.map(x => <a key={x.id} href={`#${x.id}`} style={{ padding: "5px 10px", borderRadius: 5, background: "#141414", border: "1px solid #252525", color: "#EEEEEE", fontSize: 10, textDecoration: "none", fontFamily: "'Barlow Condensed',sans-serif", textTransform: "uppercase", letterSpacing: 0.8, display: "flex", alignItems: "center", gap: 3 }}>{x.ic} {x.l}</a>)}</nav>
     </header>
 
-    <div style={{ padding: "14px 20px", background: "#0d0d0d", borderBottom: "1px solid #1a1a1a" }}>
-      <div style={{ fontSize: 12, color: "#EEEEEE", fontFamily: "'Barlow Condensed',sans-serif", textTransform: "uppercase", letterSpacing: 1.2, marginBottom: 10 }}>Athlete Setup</div>
-      <div style={{ display: "flex", gap: 10, flexWrap: "wrap", marginBottom: 10 }}>
-        <TInp label="Counselor Name" value={name} onChange={setName} ph="Last, First" wide />
-      </div>
-      <div style={{ display: "flex", gap: 10, flexWrap: "wrap" }}>
-        <Inp label="PY Baseline (March 2025 BV)" value={pyBl} onChange={setPyBl} pre="$" />
-        <Inp label="BU Median Floor" value={buMed} onChange={setBuMed} pre="$" />
-        <Inp label="Current Day of March (1-31)" value={curDay} onChange={setCurDay} />
-      </div>
-      <div style={{ marginTop: 8, padding: "8px 12px", background: "#141414", borderRadius: 6, display: "flex", gap: 20, flexWrap: "wrap", fontSize: 14, fontFamily: "'Barlow Condensed',sans-serif" }}>
-        <span style={{ color: "#EEEEEE" }}>Qualifying Weight: <span style={{ color: "#c9a227", fontWeight: 700 }}>{fmt(adj)}</span></span>
-        <span style={{ color: "#EEEEEE" }}>Elite Qualifier (110%): <span style={{ color: "#EEEEEE", fontWeight: 600 }}>{fmt(q110)}</span></span>
-        <span style={{ color: "#EEEEEE" }}>Championship Qualifier (120%): <span style={{ color: "#EEEEEE", fontWeight: 600 }}>{fmt(c120)}</span></span>
-      </div>
+    {/* ── Motivational Quote Banner ───────────────────────────────────── */}
+    <div style={{ background: "#0d0d0d", borderBottom: "1px solid #1a1a1a", padding: "10px 24px", textAlign: "center" }}>
+      <div style={{ fontSize: 14, color: "#c9a227", fontFamily: BC, fontStyle: "italic", letterSpacing: 0.5 }}>"{quote}"</div>
     </div>
 
-    <div style={{ padding: "14px 20px", background: "#0a0a0a", borderBottom: "1px solid #1a1a1a" }}>
-      <div style={{ fontSize: 12, color: "#EEEEEE", fontFamily: "'Barlow Condensed',sans-serif", textTransform: "uppercase", letterSpacing: 1.2, marginBottom: 10 }}>Current Production (March 2026)</div>
-      <div style={{ display: "flex", gap: 10, flexWrap: "wrap" }}>
-        <Inp label="Total BV" value={totalBV} onChange={setTotalBV} pre="$" />
-        <Inp label="Heritage BV" value={hBV} onChange={setHBV} pre="$" />
-        <Inp label="PAF Insurance BV" value={pBV} onChange={setPBV} pre="$" />
-        <Inp label="Large Sale BV" value={lsBV} onChange={setLsBV} pre="$" />
-        {day >= QD && <Inp label="BV as of Mar 20" value={bv20} onChange={setBv20} pre="$" />}
-      </div>
-      <div style={{ display: "flex", alignItems: "center", gap: 12, marginTop: 10, padding: "10px 14px", background: locked110 ? "#1a2e1a" : "#141414", border: `1px solid ${locked110 ? "#52b78844" : "#252525"}`, borderRadius: 8, transition: "all .3s", cursor: "pointer" }} onClick={() => setLocked110(!locked110)}>
-        <div style={{ width: 20, height: 20, borderRadius: 4, border: `2px solid ${locked110 ? "#c9a227" : "#444"}`, background: locked110 ? "#c9a227" : "transparent", display: "flex", alignItems: "center", justifyContent: "center", transition: "all .2s", flexShrink: 0 }}>
-          {locked110 && <span style={{ color: "#0a0a0a", fontSize: 14, fontWeight: 900, lineHeight: 1 }}>{"\u2713"}</span>}
-        </div>
-        <div>
-          <div style={{ fontSize: 13, fontWeight: 700, color: locked110 ? "#c9a227" : "#EEEEEE", fontFamily: "'Barlow Condensed',sans-serif", textTransform: "uppercase", letterSpacing: 0.8 }}>
-            {locked110 ? "\u2605 110% Qualified by March 20 \u2014 Locked" : "Lock 110% Qualification (check when confirmed by March 20)"}
-          </div>
-          <div style={{ fontSize: 12, color: locked110 ? "#52b788" : "#666", marginTop: 2 }}>
-            {locked110 ? "Earning $700 bonus. Hit 120% by March 31 to earn $1,200 total." : "Only check this if you reached 110% of your Training Weight by March 20."}
-          </div>
-        </div>
-      </div>
-      <div style={{ fontSize: 12, color: "#EEEEEE", marginTop: 6 }}>Working BV = Total BV minus Large Sale BV = <span style={{ color: "#666" }}>{fmt(wBV)}</span></div>
-    </div>
+    {/* ── Two-Column Layout ────────────────────────────────────────────── */}
+    <div className="olympiad-layout" style={{ display: "flex", gap: 0, maxWidth: 1400, margin: "0 auto" }}>
 
-    <main style={{ padding: 20, maxWidth: 1100, margin: "0 auto" }}>
+      {/* ── LEFT: All Inputs (collapsible) ─────────────────────────────── */}
+      <div className="olympiad-left" style={{ width: panelOpen ? 380 : 48, minWidth: panelOpen ? 340 : 48, flexShrink: 0, position: "sticky", top: 0, alignSelf: "flex-start", maxHeight: "100vh", overflowY: panelOpen ? "auto" : "hidden", background: "#0d0d0d", borderRight: "1px solid #1a1a1a", transition: "width .3s ease, min-width .3s ease" }}>
 
-      <Sec id="position" icon={"\u2B06"} title="Current Lift" sub="Where you stand right now">
-        {name && <div style={{ background: "#0e0e0e", border: "1px solid #252525", borderRadius: 10, padding: 16, marginBottom: 12, display: "flex", justifyContent: "space-between", alignItems: "center", flexWrap: "wrap", gap: 10 }}>
-          <div><div style={{ fontSize: 20, fontWeight: 800, fontFamily: "'Barlow Condensed',sans-serif" }}>{name}</div></div>
-          <div style={{ display: "flex", gap: 8 }}><Badge s={s110} /><Badge s={s120} /></div>
-        </div>}
-        <div style={{ display: "flex", gap: 10, flexWrap: "wrap", marginBottom: 14 }}>
-          <Card label="Current Lift" value={fmt(wBV)} sub={`of ${fmt(adj)} baseline`} />
-          <Card label="Performance Delta" value={fmtP(pct)} sub={pct >= 1 ? "Above baseline" : `${fmt(adj - wBV)} to go`} accent={pct >= 1 ? "#52b788" : "#c9a227"} />
-          <Card label="Bonus Potential" value={`$${bonus.toLocaleString()}`} sub={bonus >= 1200 ? "110% + 120% — Full bonus earned" : bonus === 700 ? "110% locked — hit 120% for $1,200" : bonus === 500 ? "120% only — 110% not locked by Mar 20" : "No bonus qualification yet"} accent="#52b788" />
+        {/* Toggle button */}
+        <div onClick={() => setPanelOpen(!panelOpen)} style={{ padding: panelOpen ? "12px 20px" : "12px 0", display: "flex", alignItems: "center", justifyContent: panelOpen ? "space-between" : "center", cursor: "pointer", borderBottom: "1px solid #1a1a1a", background: "#111", transition: "padding .3s" }}>
+          {panelOpen && <span style={{ fontSize: 13, fontWeight: 700, color: "#c9a227", fontFamily: BC, textTransform: "uppercase", letterSpacing: 1.5 }}>Input Panel</span>}
+          <span style={{ fontSize: 18, color: "#c9a227", fontWeight: 700, fontFamily: BC, transform: panelOpen ? "rotate(0deg)" : "rotate(180deg)", transition: "transform .3s", display: "inline-block" }}>{"\u25BC"}</span>
         </div>
-        <div style={{ background: "#0e0e0e", border: "1px solid #252525", borderRadius: 10, padding: 16 }}>
-          <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "5px 24px", fontSize: 14, fontFamily: "'Barlow Condensed',sans-serif", marginBottom: 14 }}>
-            <span style={{ color: "#EEEEEE" }}>PY Production</span><span style={{ color: "#EEEEEE", fontWeight: 600 }}>{fmt(py)}</span>
-            <span style={{ color: "#EEEEEE" }}>BU Median Floor</span><span style={{ color: "#EEEEEE", fontWeight: 600 }}>{fmt(med)}</span>
-            <span style={{ color: "#c9a227" }}>Qualifying Weight</span><span style={{ color: "#c9a227", fontWeight: 700 }}>{fmt(adj)}</span>
-            <span style={{ color: "#EEEEEE" }}>Elite Qualifier (110%)</span><span style={{ color: "#EEEEEE", fontWeight: 600 }}>{fmt(q110)}</span>
-            <span style={{ color: "#EEEEEE" }}>Championship Qualifier (120%)</span><span style={{ color: "#EEEEEE", fontWeight: 600 }}>{fmt(c120)}</span>
-          </div>
-          <Bar cur={wBV} tgt={c120} label="Progress to Championship Round" color="#52b788" marker={c120 > 0 ? q110 / c120 : 0} />
-          <Bar cur={tH} tgt={py > 0 ? py * 0.4 : med * 0.3} label="Heritage BV" color="#6c8ebf" />
-          <Bar cur={tP} tgt={py > 0 ? py * 0.6 : med * 0.5} label="PAF Insurance BV" color="#b07cc6" />
-        </div>
-      </Sec>
 
-      <Sec id="minimum" icon={"\uD83D\uDD01"} title="Daily Reps" sub="What it takes from here to qualify">
-        <div style={{ display: "flex", gap: 10, flexWrap: "wrap", marginBottom: 14 }}>
-          <Card label="Gain to Elite Qualifier (110%)" value={fmt(g2q)} sub={g2q <= 0 ? "Target reached" : `${d2q} days remaining`} accent={g2q <= 0 ? "#52b788" : "#c9a227"} />
-          <Card label="Daily Reps to Qualify" value={drQ === Infinity ? "\u2014" : fmt(drQ)} sub={d2q <= 0 ? "Qualifying Day passed" : "per day through Mar 20"} accent="#52b788" />
-          <Card label="Gain to Championship Qualifier (120%)" value={fmt(g2c)} sub={g2c <= 0 ? "#52b788" : `${d2c} days remaining`} accent={g2c <= 0 ? "#52b788" : "#c9a227"} />
-          <Card label="Daily Reps to Championship" value={drC === Infinity ? "\u2014" : fmt(drC)} sub={d2c <= 0 ? "Championship Day passed" : "per day through Mar 31"} accent="#52b788" />
-        </div>
-        <div style={{ background: "#0e0e0e", border: "1px solid #252525", borderRadius: 10, padding: 16 }}>
-          <div style={{ fontSize: 12, color: "#EEEEEE", fontFamily: "'Barlow Condensed',sans-serif", textTransform: "uppercase", letterSpacing: 1.2, marginBottom: 10 }}>Pace Analysis</div>
-          <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: 14, textAlign: "center" }}>
-            <div><div style={{ fontSize: 12, color: "#EEEEEE", fontFamily: "'Barlow Condensed',sans-serif", textTransform: "uppercase", letterSpacing: 1 }}>Current Daily Avg</div><div style={{ fontSize: 28, fontWeight: 800, fontFamily: "'Barlow Condensed',sans-serif" }}>{fmt(dAvg)}</div><div style={{ fontSize: 13, color: "#EEEEEE" }}>per day so far</div></div>
-            <div><div style={{ fontSize: 12, color: "#EEEEEE", fontFamily: "'Barlow Condensed',sans-serif", textTransform: "uppercase", letterSpacing: 1 }}>Projected at Mar 20</div><div style={{ fontSize: 28, fontWeight: 800, fontFamily: "'Barlow Condensed',sans-serif", color: p20proj >= q110 ? "#52b788" : "#c9a227" }}>{fmt(p20proj)}</div><div style={{ fontSize: 13, color: "#EEEEEE" }}>{p20proj >= q110 ? "On pace for $700 bonus" : `${fmt(q110 - p20proj)} short of qualifying`}</div></div>
-            <div><div style={{ fontSize: 12, color: "#EEEEEE", fontFamily: "'Barlow Condensed',sans-serif", textTransform: "uppercase", letterSpacing: 1 }}>Projected Finish</div><div style={{ fontSize: 28, fontWeight: 800, fontFamily: "'Barlow Condensed',sans-serif", color: pFin >= c120 ? "#52b788" : "#e8e8e8" }}>{fmt(pFin)}</div><div style={{ fontSize: 13, color: "#EEEEEE" }}>{pFin >= c120 ? "Championship round pace" : pFin >= q110 ? "Qualifying pace, push for championship" : "Increase daily output"}</div></div>
-          </div>
-          <div style={{ marginTop: 18, position: "relative", height: 30, background: "#1a1a1a", borderRadius: 6 }}>
-            <div style={{ position: "absolute", left: `${c120 > 0 ? cl(adj / c120, 0, 1) * 100 : 83.3}%`, top: 0, bottom: 0, width: 1, background: "#333" }}><span style={{ position: "absolute", top: -14, left: -12, fontSize: 8, color: "#EEEEEE", fontFamily: "'Barlow Condensed',sans-serif", whiteSpace: "nowrap" }}>100%</span></div>
-            <div style={{ position: "absolute", left: `${c120 > 0 ? cl(q110 / c120, 0, 1) * 100 : 91.7}%`, top: 0, bottom: 0, width: 2, background: "#c9a22766" }}><span style={{ position: "absolute", top: -14, left: -6, fontSize: 8, color: "#c9a227", fontFamily: "'Barlow Condensed',sans-serif" }}>110%</span></div>
-            <div style={{ position: "absolute", right: 0, top: 0, bottom: 0, width: 2, background: "#52b78866" }}><span style={{ position: "absolute", top: -14, right: -6, fontSize: 8, color: "#52b788", fontFamily: "'Barlow Condensed',sans-serif" }}>120%</span></div>
-            <div style={{ width: `${c120 > 0 ? cl(wBV / c120, 0, 1) * 100 : 0}%`, height: "100%", borderRadius: 6, background: "linear-gradient(90deg,#c9a22722,#c9a22766)", transition: "width .6s" }} />
-            {pFin > 0 && c120 > 0 && <div style={{ position: "absolute", left: `${cl(pFin / c120, 0, 1) * 100}%`, top: 3, width: 7, height: 24, borderRadius: 4, background: pFin >= c120 ? "#52b788" : "#e74c3c", border: "2px solid #0a0a0a", opacity: 0.85 }}><span style={{ position: "absolute", bottom: -14, left: -16, fontSize: 8, color: pFin >= c120 ? "#52b788" : "#e74c3c", fontFamily: "'Barlow Condensed',sans-serif", whiteSpace: "nowrap" }}>Projected</span></div>}
-          </div>
-        </div>
-      </Sec>
+        {panelOpen && <div style={{ padding: "4px 20px 24px" }}>
+          <GroupLabel>Athlete</GroupLabel>
+          <TextField label="Counselor Name" value={name} onChange={setName} ph="Last, First" />
 
-      <Sec id="training" icon={"\uD83D\uDCCB"} title="Training Log" sub="Model your output to see what it takes">
-        <div style={{ background: "#0e0e0e", border: "1px solid #252525", borderRadius: 10, padding: 16, marginBottom: 14 }}>
-          <div style={{ fontSize: 12, color: "#EEEEEE", fontFamily: "'Barlow Condensed',sans-serif", textTransform: "uppercase", letterSpacing: 1.2, marginBottom: 10 }}>Weekly Behavior Input</div>
+          <GroupLabel>Baseline</GroupLabel>
           <div style={{ display: "flex", gap: 10, flexWrap: "wrap" }}>
-            <Inp label="Activities (Sets)" value={acts} onChange={setActs} />
-            <Inp label="Appointments (Reps Booked)" value={appts} onChange={setAppts} />
-            <Inp label="Presentations (Reps Completed)" value={pres} onChange={setPres} />
-            <Inp label="Pres. Resulting in Sale" value={presSale} onChange={setPresSale} />
-            <Inp label="Avg Contract Value" value={acv} onChange={setAcv} pre="$" />
+            <Field label="PY Baseline (Mar 2025)" value={pyBl} onChange={setPyBl} pre="$" />
+            <Field label="BU Median Floor" value={buMed} onChange={setBuMed} pre="$" />
           </div>
-        </div>
-        <div style={{ display: "flex", gap: 10, flexWrap: "wrap", marginBottom: 14 }}>
-          <Card label="Appointment Set Rate" value={fmtP(apptR)} sub="Appointments / Activities" accent={apptR > 0 ? "#6c8ebf" : "#444"} />
-          <Card label="Presentation Hold Rate" value={fmtP(holdR)} sub="Presentations / Appointments" accent={holdR > 0 ? "#b07cc6" : "#444"} />
-          <Card label="Conversion Strength" value={fmtP(closeR)} sub="Sales / Presentations" accent={closeR >= 0.3 ? "#52b788" : closeR > 0 ? "#c9a227" : "#444"} />
-          <Card label="Projected Weekly BV" value={fmt(projW)} sub={`${nPS} sales x ${fmt(nAcv)} ACV`} accent={projW > 0 ? "#e8e8e8" : "#444"} />
-        </div>
-        {projW > 0 && <div style={{ background: "#0e0e0e", border: "1px solid #252525", borderRadius: 10, padding: 16 }}>
-          <div style={{ fontSize: 12, color: "#EEEEEE", fontFamily: "'Barlow Condensed',sans-serif", textTransform: "uppercase", letterSpacing: 1.2, marginBottom: 8 }}>Projected Finish from Training Log</div>
-          <div style={{ display: "flex", gap: 20, alignItems: "center", flexWrap: "wrap" }}>
-            <div><div style={{ fontSize: 34, fontWeight: 800, fontFamily: "'Barlow Condensed',sans-serif", color: behP >= c120 ? "#52b788" : behP >= q110 ? "#c9a227" : "#e8e8e8" }}>{fmt(behP)}</div><div style={{ fontSize: 14, color: "#EEEEEE" }}>Current lift + weekly output x {wksR.toFixed(1)} weeks remaining</div></div>
-            <div style={{ flex: 1, minWidth: 200 }}><Bar cur={behP} tgt={c120} label="Behavior-Projected vs Championship" color={behP >= c120 ? "#52b788" : "#c9a227"} marker={c120 > 0 ? q110 / c120 : 0} /></div>
+          <div style={{ marginTop: 10 }}>
+            <Field label="Current Day of March (1-31)" value={curDay} onChange={setCurDay} />
           </div>
-          <div style={{ fontSize: 14, color: behP >= c120 ? "#52b788" : behP >= q110 ? "#c9a227" : "#e74c3c", fontFamily: "'Barlow Condensed',sans-serif", fontWeight: 700, marginTop: 8, textTransform: "uppercase", letterSpacing: 0.5 }}>
-            {behP >= c120 ? "Your training puts you in championship range. Keep this pace." : behP >= q110 ? "You're tracking toward qualifying. Push for one more sale per week to reach championship." : "At this output, you'll fall short. Look at increasing presentations or raising your average contract value."}
-          </div>
-        </div>}
-      </Sec>
 
-      <Sec id="podium" icon={"\uD83C\uDFC5"} title="Podium Push" sub="What it takes to reach Top 5">
-        <div style={{ background: "#0e0e0e", border: "1px solid #252525", borderRadius: 10, padding: 16, marginBottom: 14 }}>
-          <div style={{ fontSize: 12, color: "#EEEEEE", fontFamily: "'Barlow Condensed',sans-serif", textTransform: "uppercase", letterSpacing: 1.2, marginBottom: 10 }}>Enter Current Top 5 Thresholds (from your manager or Podium sheet)</div>
-          <div style={{ display: "flex", gap: 10, flexWrap: "wrap" }}>
-            <Inp label="Top 5 Total BV Threshold" value={t5t} onChange={setT5t} pre="$" />
-            <Inp label="Top 5 Heritage BV Threshold" value={t5h} onChange={setT5h} pre="$" />
-            <Inp label="Top 5 PAF BV Threshold" value={t5p} onChange={setT5p} pre="$" />
-          </div>
-        </div>
-        <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit,minmax(300px,1fr))", gap: 12 }}>
-          {[{ label: "Total BV Podium", gap: gPt, cur: wBV, thresh: v5t, contracts: cPt, pres: prPt, color: "#c9a227", inP: wBV >= v5t && v5t > 0 },
-            { label: "Heritage Podium", gap: gPh, cur: tH, thresh: v5h, contracts: cPh, pres: prPh, color: "#6c8ebf", inP: tH >= v5h && v5h > 0 },
-            { label: "PAF Podium", gap: gPp, cur: tP, thresh: v5p, contracts: cPp, pres: prPp, color: "#b07cc6", inP: tP >= v5p && v5p > 0 }
-          ].map(pd => <div key={pd.label} style={{ background: "#0e0e0e", border: "1px solid #252525", borderRadius: 10, padding: 16 }}>
-            <div style={{ fontSize: 15, fontWeight: 700, fontFamily: "'Barlow Condensed',sans-serif", textTransform: "uppercase", letterSpacing: 1, color: pd.color, marginBottom: 10 }}>{pd.label}</div>
-            <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "4px 16px", fontSize: 14, fontFamily: "'Barlow Condensed',sans-serif", marginBottom: 10 }}>
-              <span style={{ color: "#EEEEEE" }}>Your Current</span><span style={{ color: "#EEEEEE", fontWeight: 600 }}>{fmt(pd.cur)}</span>
-              <span style={{ color: "#EEEEEE" }}>Top 5 Threshold</span><span style={{ color: "#EEEEEE", fontWeight: 600 }}>{pd.thresh > 0 ? fmt(pd.thresh) : "Not set"}</span>
-              <span style={{ color: pd.color }}>Distance to Podium</span><span style={{ color: pd.color, fontWeight: 700 }}>{pd.thresh <= 0 ? "Enter threshold" : pd.inP ? "On Podium" : fmt(pd.gap)}</span>
+          <div style={{ marginTop: 12, padding: "10px 14px", background: "#0a0a0a", borderRadius: 8, border: "1px solid #1a1a1a" }}>
+            <div style={{ display: "grid", gridTemplateColumns: "1fr auto", gap: "4px 12px", fontSize: 14, fontFamily: BC }}>
+              <span style={{ color: "#c9a227" }}>Training Weight</span><span style={{ color: "#c9a227", fontWeight: 700, textAlign: "right" }}>{fmt(adj)}</span>
+              <span style={{ color: "#bbb" }}>Elite Qualifier (110%)</span><span style={{ color: "#ddd", fontWeight: 600, textAlign: "right" }}>{fmt(q110)}</span>
+              <span style={{ color: "#bbb" }}>Championship (120%)</span><span style={{ color: "#ddd", fontWeight: 600, textAlign: "right" }}>{fmt(c120)}</span>
             </div>
-            {pd.thresh > 0 && !pd.inP && pd.gap > 0 && <div style={{ borderTop: "1px solid #1a1a1a", paddingTop: 8, fontSize: 14, fontFamily: "'Barlow Condensed',sans-serif" }}>
-              <div style={{ display: "flex", justifyContent: "space-between", marginBottom: 3 }}><span style={{ color: "#EEEEEE" }}>Contracts Required</span><span style={{ color: "#EEEEEE", fontWeight: 700 }}>{pd.contracts}</span></div>
-              <div style={{ display: "flex", justifyContent: "space-between" }}><span style={{ color: "#EEEEEE" }}>Presentations Required</span><span style={{ color: "#EEEEEE", fontWeight: 700 }}>{pd.pres}</span></div>
-              <div style={{ fontSize: 12, color: "#EEEEEE", marginTop: 6 }}>Based on {fmt(aCV)} avg contract value and {fmtP(cr)} conversion rate</div>
-            </div>}
-            {pd.inP && <div style={{ fontSize: 13, fontWeight: 700, color: pd.color, fontFamily: "'Barlow Condensed',sans-serif", textTransform: "uppercase", textAlign: "center", padding: "8px 0" }}>You're on the podium. Defend your position.</div>}
-          </div>)}
-        </div>
-      </Sec>
+          </div>
 
-      <div style={{ textAlign: "center", padding: "28px 0 14px", borderTop: "1px solid #1a1a1a", marginTop: 24 }}>
-        <div style={{ fontSize: 10, color: "#252525", fontFamily: "'Barlow Condensed',sans-serif", textTransform: "uppercase", letterSpacing: 2 }}>MSBU March Olympiad \u00B7 Performance Intelligence System \u00B7 Q1 2026</div>
+          <GroupLabel>Current Production</GroupLabel>
+          <div style={{ display: "flex", gap: 10, flexWrap: "wrap" }}>
+            <Field label="Total BV" value={totalBV} onChange={setTotalBV} pre="$" />
+            <Field label="Large Sale BV" value={lsBV} onChange={setLsBV} pre="$" />
+          </div>
+          <div style={{ display: "flex", gap: 10, flexWrap: "wrap", marginTop: 10 }}>
+            <Field label="Heritage BV" value={hBV} onChange={setHBV} pre="$" />
+            <Field label="PAF Insurance BV" value={pBV} onChange={setPBV} pre="$" />
+          </div>
+          {day >= QD && <div style={{ marginTop: 10 }}><Field label="BV as of Mar 20" value={bv20} onChange={setBv20} pre="$" /></div>}
+
+          <div style={{ fontSize: 13, color: "#888", marginTop: 8 }}>Working BV = <span style={{ color: "#e8e8e8", fontWeight: 700 }}>{fmt(wBV)}</span></div>
+
+          {/* Elite Qualifier Lock */}
+          <div style={{ display: "flex", alignItems: "center", gap: 12, marginTop: 14, padding: "12px 14px", background: locked110 ? "#1a2e1a" : "#111", border: `2px solid ${locked110 ? "#52b78866" : "#252525"}`, borderRadius: 8, transition: "all .3s", cursor: "pointer" }} onClick={() => setLocked110(!locked110)}>
+            <div style={{ width: 22, height: 22, borderRadius: 5, border: `2px solid ${locked110 ? "#c9a227" : "#555"}`, background: locked110 ? "#c9a227" : "transparent", display: "flex", alignItems: "center", justifyContent: "center", transition: "all .2s", flexShrink: 0 }}>
+              {locked110 && <span style={{ color: "#0a0a0a", fontSize: 15, fontWeight: 900, lineHeight: 1 }}>{"\u2713"}</span>}
+            </div>
+            <div>
+              <div style={{ fontSize: 13, fontWeight: 700, color: locked110 ? "#c9a227" : "#ccc", fontFamily: BC, textTransform: "uppercase", letterSpacing: 0.8 }}>
+                {locked110 ? "\u2605 Elite Qualifier Locked" : "Lock Elite Qualifier (110% by Mar 20)"}
+              </div>
+              <div style={{ fontSize: 12, color: locked110 ? "#52b788" : "#666", marginTop: 2 }}>
+                {locked110 ? "Earning $700. Hit Championship for $1,200 total." : "Check only when confirmed by March 20."}
+              </div>
+            </div>
+          </div>
+
+          <GroupLabel>Weekly Training Log</GroupLabel>
+          <div style={{ display: "flex", gap: 10, flexWrap: "wrap" }}>
+            <Field label="Activities (Sets)" value={acts} onChange={setActs} />
+            <Field label="Appts Booked" value={appts} onChange={setAppts} />
+          </div>
+          <div style={{ display: "flex", gap: 10, flexWrap: "wrap", marginTop: 10 }}>
+            <Field label="Presentations" value={pres} onChange={setPres} />
+            <Field label="Pres. w/ Sale" value={presSale} onChange={setPresSale} />
+          </div>
+          <div style={{ marginTop: 10 }}>
+            <Field label="Average Contract BV" value={acv} onChange={setAcv} pre="$" />
+          </div>
+
+          <GroupLabel>Podium Thresholds</GroupLabel>
+          <div style={{ fontSize: 12, color: "#666", marginBottom: 8 }}>Enter current Top 5 values from your manager</div>
+          <div style={{ display: "flex", gap: 10, flexWrap: "wrap" }}>
+            <Field label="Top 5 Total BV" value={t5t} onChange={setT5t} pre="$" />
+            <Field label="Top 5 Heritage" value={t5h} onChange={setT5h} pre="$" />
+          </div>
+          <div style={{ marginTop: 10 }}>
+            <Field label="Top 5 PAF" value={t5p} onChange={setT5p} pre="$" />
+          </div>
+        </div>}
       </div>
-    </main>
+
+      {/* ── RIGHT: Intelligence Output ─────────────────────────────────── */}
+      <div style={{ flex: 1, padding: "20px 24px", minWidth: 0 }}>
+
+        {/* Athlete Banner */}
+        {name && <div style={{ background: "#111", border: "1px solid #252525", borderRadius: 10, padding: 16, marginBottom: 20, display: "flex", justifyContent: "space-between", alignItems: "center", flexWrap: "wrap", gap: 10 }}>
+          <div style={{ fontSize: 22, fontWeight: 800, fontFamily: BC }}>{name}</div>
+          <div style={{ display: "flex", gap: 12 }}>
+            <Badge label="Elite" s={s110} />
+            <Badge label="Championship" s={s120} />
+          </div>
+        </div>}
+
+        {/* ═══ CURRENT LIFT ═══ */}
+        <Sec icon={"\u2B06"} title="Current Lift" sub="Where you stand and what you need per day">
+          <div style={{ display: "flex", gap: 10, flexWrap: "wrap", marginBottom: 16 }}>
+            <Card label="Current Lift" value={fmt(wBV)} sub={`of ${fmt(adj)} training weight`} />
+            <Card label="Performance Delta" value={fmtP(pct)} sub={pct >= 1 ? "Above baseline" : `${fmt(adj - wBV)} to baseline`} accent={pct >= 1 ? "#52b788" : "#c9a227"} />
+            <Card label="Bonus Potential" value={`$${bonus.toLocaleString()}`} sub={bonus >= 1200 ? "Elite + Championship earned" : bonus === 700 ? "Elite locked. Hit Championship for $1,200" : bonus === 500 ? "Championship only. Elite not locked" : "No bonus yet"} accent="#52b788" />
+          </div>
+
+          {/* Progress bars - Elite + Championship + Heritage + PAF */}
+          <div style={{ background: "#111", border: "1px solid #252525", borderRadius: 10, padding: 16, marginBottom: 16 }}>
+            <Bar cur={wBV} tgt={q110} label="Progress to Elite Qualifier (110%)" color="#c9a227" />
+            <Bar cur={wBV} tgt={c120} label="Progress to Championship Qualifier (120%)" color="#52b788" marker={c120 > 0 ? q110 / c120 : 0} />
+            <Bar cur={tH} tgt={py > 0 ? py * 0.4 : med * 0.3} label="Heritage BV" color="#6c8ebf" />
+            <Bar cur={tP} tgt={py > 0 ? py * 0.6 : med * 0.5} label="PAF Insurance BV" color="#b07cc6" />
+          </div>
+
+          {/* Daily reps + pace */}
+          <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit,minmax(200px,1fr))", gap: 10, marginBottom: 16 }}>
+            <div style={{ background: "#111", border: "1px solid #252525", borderRadius: 10, padding: 16, textAlign: "center" }}>
+              <div style={{ fontSize: 12, color: "#aaa", fontFamily: BC, textTransform: "uppercase", letterSpacing: 1, marginBottom: 4 }}>Daily Avg BV</div>
+              <div style={{ fontSize: 30, fontWeight: 800, fontFamily: BC }}>{fmt(dAvg)}</div>
+              <div style={{ fontSize: 13, color: "#888" }}>per day so far</div>
+            </div>
+            <div style={{ background: "#111", border: "1px solid #252525", borderRadius: 10, padding: 16, textAlign: "center" }}>
+              <div style={{ fontSize: 12, color: "#aaa", fontFamily: BC, textTransform: "uppercase", letterSpacing: 1, marginBottom: 4 }}>Need per Day for Elite</div>
+              <div style={{ fontSize: 30, fontWeight: 800, fontFamily: BC, color: "#c9a227" }}>{drQ === Infinity ? "\u2014" : fmt(drQ)}</div>
+              <div style={{ fontSize: 13, color: "#888" }}>{d2q > 0 ? `${d2q} days to Mar 20` : "Elite deadline passed"}</div>
+            </div>
+            <div style={{ background: "#111", border: "1px solid #252525", borderRadius: 10, padding: 16, textAlign: "center" }}>
+              <div style={{ fontSize: 12, color: "#aaa", fontFamily: BC, textTransform: "uppercase", letterSpacing: 1, marginBottom: 4 }}>Need per Day for Championship</div>
+              <div style={{ fontSize: 30, fontWeight: 800, fontFamily: BC, color: "#52b788" }}>{drC === Infinity ? "\u2014" : fmt(drC)}</div>
+              <div style={{ fontSize: 13, color: "#888" }}>{d2c > 0 ? `${d2c} days to Mar 31` : "Championship day passed"}</div>
+            </div>
+          </div>
+
+          {/* Projections */}
+          <div style={{ background: "#111", border: "1px solid #252525", borderRadius: 10, padding: 16 }}>
+            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-end", flexWrap: "wrap", gap: 16, marginBottom: 14 }}>
+              <div>
+                <div style={{ fontSize: 12, color: "#aaa", fontFamily: BC, textTransform: "uppercase", letterSpacing: 1 }}>Projected at Mar 20</div>
+                <div style={{ fontSize: 28, fontWeight: 800, fontFamily: BC, color: "#c9a227" }}>{fmt(p20proj)}</div>
+                <div style={{ fontSize: 13, color: "#aaa" }}>{p20proj >= q110 ? "On pace for Elite Qualifier" : `${fmt(q110 - p20proj)} short of Elite`}</div>
+              </div>
+              <div style={{ textAlign: "right" }}>
+                <div style={{ fontSize: 12, color: "#aaa", fontFamily: BC, textTransform: "uppercase", letterSpacing: 1 }}>Projected Finish</div>
+                <div style={{ fontSize: 28, fontWeight: 800, fontFamily: BC, color: "#52b788" }}>{fmt(pFin)}</div>
+                <div style={{ fontSize: 13, color: "#aaa" }}>{pFin >= c120 ? "Championship pace" : pFin >= q110 ? "Elite pace, push for Championship" : "Below Elite pace"}</div>
+              </div>
+            </div>
+            {/* Visual pace bar */}
+            <div style={{ position: "relative", height: 32, background: "#1a1a1a", borderRadius: 6 }}>
+              <div style={{ position: "absolute", left: `${c120 > 0 ? cl(adj / c120, 0, 1) * 100 : 83.3}%`, top: 0, bottom: 0, width: 1, background: "#333" }}>
+                <span style={{ position: "absolute", top: -15, left: -14, fontSize: 9, color: "#555", fontFamily: BC, whiteSpace: "nowrap" }}>100%</span>
+              </div>
+              <div style={{ position: "absolute", left: `${c120 > 0 ? cl(q110 / c120, 0, 1) * 100 : 91.7}%`, top: 0, bottom: 0, width: 2, background: "#c9a22766" }}>
+                <span style={{ position: "absolute", top: -15, left: -12, fontSize: 9, color: "#c9a227", fontFamily: BC, whiteSpace: "nowrap" }}>Elite</span>
+              </div>
+              <div style={{ position: "absolute", right: 0, top: 0, bottom: 0, width: 2, background: "#52b78866" }}>
+                <span style={{ position: "absolute", top: -15, right: -6, fontSize: 9, color: "#52b788", fontFamily: BC }}>Champ</span>
+              </div>
+              <div style={{ width: `${c120 > 0 ? cl(wBV / c120, 0, 1) * 100 : 0}%`, height: "100%", borderRadius: 6, background: "linear-gradient(90deg,#c9a22722,#c9a22766)", transition: "width .6s" }} />
+              {pFin > 0 && c120 > 0 && <div style={{ position: "absolute", left: `${cl(pFin / c120, 0, 1) * 100}%`, top: 3, width: 8, height: 26, borderRadius: 4, background: pFin >= c120 ? "#52b788" : "#e74c3c", border: "2px solid #0a0a0a", opacity: 0.85 }}>
+                <span style={{ position: "absolute", bottom: -15, left: -18, fontSize: 9, color: pFin >= c120 ? "#52b788" : "#e74c3c", fontFamily: BC, whiteSpace: "nowrap" }}>Projected</span>
+              </div>}
+            </div>
+          </div>
+        </Sec>
+
+        {/* ═══ TRAINING LOG OUTPUT ═══ */}
+        <Sec icon={"\uD83D\uDCCB"} title="Training Log" sub="What your weekly behaviors project">
+          <div style={{ display: "flex", gap: 10, flexWrap: "wrap", marginBottom: 14 }}>
+            <Card label="Set Rate" value={fmtP(apptR)} sub="Appts / Activities" accent={apptR > 0 ? "#6c8ebf" : "#444"} />
+            <Card label="Hold Rate" value={fmtP(holdR)} sub="Pres. / Appts" accent={holdR > 0 ? "#b07cc6" : "#444"} />
+            <Card label="Conversion" value={fmtP(closeR)} sub="Sales / Pres." accent={closeR > 0 ? "#e8e8e8" : "#444"} />
+            <Card label="Weekly BV" value={fmt(projW)} sub={`${nPS} sales x ${fmt(nAcv)} avg contract`} accent={projW > 0 ? "#e8e8e8" : "#444"} />
+          </div>
+
+          {projW > 0 && <div style={{ background: "#111", border: "1px solid #252525", borderRadius: 10, padding: 16 }}>
+            <div style={{ display: "flex", gap: 20, alignItems: "center", flexWrap: "wrap" }}>
+              <div>
+                <div style={{ fontSize: 12, color: "#aaa", fontFamily: BC, textTransform: "uppercase", letterSpacing: 1 }}>Behavior-Projected Finish</div>
+                <div style={{ fontSize: 36, fontWeight: 800, fontFamily: BC, color: behP >= c120 ? "#52b788" : behP >= q110 ? "#c9a227" : "#e8e8e8" }}>{fmt(behP)}</div>
+                <div style={{ fontSize: 14, color: "#aaa" }}>Current lift + weekly output x {wksR.toFixed(1)} weeks</div>
+              </div>
+              <div style={{ flex: 1, minWidth: 200 }}>
+                <Bar cur={behP} tgt={c120} label="Behavior Projection vs Championship" color={behP >= c120 ? "#52b788" : "#c9a227"} marker={c120 > 0 ? q110 / c120 : 0} />
+              </div>
+            </div>
+            <div style={{ fontSize: 14, color: behP >= c120 ? "#52b788" : behP >= q110 ? "#c9a227" : "#e74c3c", fontFamily: BC, fontWeight: 700, marginTop: 10, textTransform: "uppercase", letterSpacing: 0.5 }}>
+              {behP >= c120 ? "Your training puts you in Championship range. Keep this pace." : behP >= q110 ? "Tracking toward Elite. One more sale per week gets you to Championship." : "At this output, you'll fall short. Increase presentations or raise your average contract BV."}
+            </div>
+          </div>}
+        </Sec>
+
+        {/* ═══ PODIUM PUSH ═══ */}
+        <Sec icon={"\uD83C\uDFC5"} title="Podium Push" sub="What it takes to reach Top 5">
+          <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit,minmax(280px,1fr))", gap: 12 }}>
+            {[{ label: "Total BV", gap: gPt, cur: wBV, thresh: v5t, contracts: cPt, pres: prPt, color: "#c9a227", inP: wBV >= v5t && v5t > 0 },
+              { label: "Heritage", gap: gPh, cur: tH, thresh: v5h, contracts: cPh, pres: prPh, color: "#6c8ebf", inP: tH >= v5h && v5h > 0 },
+              { label: "PAF Insurance", gap: gPp, cur: tP, thresh: v5p, contracts: cPp, pres: prPp, color: "#b07cc6", inP: tP >= v5p && v5p > 0 }
+            ].map(pd => <div key={pd.label} style={{ background: "#111", border: "1px solid #252525", borderRadius: 10, padding: 16 }}>
+              <div style={{ fontSize: 15, fontWeight: 700, fontFamily: BC, textTransform: "uppercase", letterSpacing: 1, color: pd.color, marginBottom: 10 }}>{pd.label} Podium</div>
+              <div style={{ display: "grid", gridTemplateColumns: "1fr auto", gap: "5px 16px", fontSize: 14, fontFamily: BC, marginBottom: 10 }}>
+                <span style={{ color: "#bbb" }}>Your Current</span><span style={{ color: "#ddd", fontWeight: 600 }}>{fmt(pd.cur)}</span>
+                <span style={{ color: "#bbb" }}>Top 5 Threshold</span><span style={{ color: "#ddd", fontWeight: 600 }}>{pd.thresh > 0 ? fmt(pd.thresh) : "Not set"}</span>
+                <span style={{ color: pd.color }}>Distance</span><span style={{ color: pd.color, fontWeight: 700 }}>{pd.thresh <= 0 ? "Enter threshold" : pd.inP ? "On Podium" : fmt(pd.gap)}</span>
+              </div>
+              {pd.thresh > 0 && !pd.inP && pd.gap > 0 && <div style={{ borderTop: "1px solid #1a1a1a", paddingTop: 8, fontSize: 14, fontFamily: BC }}>
+                <div style={{ display: "flex", justifyContent: "space-between", marginBottom: 4 }}><span style={{ color: "#bbb" }}>Contracts</span><span style={{ color: "#ddd", fontWeight: 700 }}>{pd.contracts}</span></div>
+                <div style={{ display: "flex", justifyContent: "space-between" }}><span style={{ color: "#bbb" }}>Presentations</span><span style={{ color: "#ddd", fontWeight: 700 }}>{pd.pres}</span></div>
+                <div style={{ fontSize: 12, color: "#666", marginTop: 6 }}>Based on {fmt(aCV)} average contract BV and {fmtP(cr)} conversion</div>
+              </div>}
+              {pd.inP && <div style={{ fontSize: 14, fontWeight: 700, color: pd.color, fontFamily: BC, textTransform: "uppercase", textAlign: "center", padding: "8px 0" }}>On the podium. Defend it.</div>}
+            </div>)}
+          </div>
+        </Sec>
+
+        <div style={{ textAlign: "center", padding: "20px 0 10px", borderTop: "1px solid #1a1a1a", marginTop: 16 }}>
+          <div style={{ fontSize: 10, color: "#252525", fontFamily: BC, textTransform: "uppercase", letterSpacing: 2 }}>MSBU March Olympiad {"\u00B7"} Performance Intelligence System {"\u00B7"} Q1 2026</div>
+        </div>
+      </div>
+    </div>
   </div>;
 }
