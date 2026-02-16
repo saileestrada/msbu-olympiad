@@ -196,6 +196,17 @@ export default function App(){
   const[locked110,setLocked110]=useState(initial.lk==="1");
   const[panelOpen,setPanelOpen]=useState(true);
   const[avatarOpen,setAvatarOpen]=useState(false);
+  const[copied,setCopied]=useState(false);
+
+  const handleShare=()=>{
+    const url=window.location.href;
+    if(navigator.clipboard&&navigator.clipboard.writeText){
+      navigator.clipboard.writeText(url).then(()=>{setCopied(true);setTimeout(()=>setCopied(false),2000)});
+    }else{
+      const t=document.createElement("textarea");t.value=url;document.body.appendChild(t);t.select();document.execCommand("copy");document.body.removeChild(t);
+      setCopied(true);setTimeout(()=>setCopied(false),2000);
+    }
+  };
 
   const[avGender,setAvGender]=useState(parseInt(initial.ag)||0);
   const[avBody,setAvBody]=useState(parseInt(initial.ab)||0);
@@ -257,6 +268,20 @@ export default function App(){
 
     <div style={{background:"#0d0d0d",borderBottom:"1px solid #1a1a1a",padding:"10px 24px",textAlign:"center"}}>
       <div style={{fontSize:14,color:"#c9a227",fontFamily:BC,fontStyle:"italic",letterSpacing:0.5}}>"{quote}"</div>
+    </div>
+
+    {/* Action Bar */}
+    <div style={{background:"#0a0a0a",borderBottom:"1px solid #1a1a1a",padding:"10px 24px",display:"flex",justifyContent:"center",gap:12,flexWrap:"wrap"}}>
+      <div onClick={()=>window.open("https://saileestrada.github.io/msbu-olympiad/#d=1","_blank")} style={{display:"inline-flex",alignItems:"center",gap:6,padding:"8px 18px",background:"linear-gradient(135deg,#c9a227,#8b6914)",color:"#0a0a0a",borderRadius:6,fontSize:13,fontWeight:700,fontFamily:BC,textTransform:"uppercase",letterSpacing:1,cursor:"pointer",transition:"opacity .2s"}}
+        onMouseEnter={e=>e.currentTarget.style.opacity="0.85"}
+        onMouseLeave={e=>e.currentTarget.style.opacity="1"}>
+        + Start Fresh
+      </div>
+      <div onClick={handleShare} style={{display:"inline-flex",alignItems:"center",gap:6,padding:"8px 18px",background:copied?"#52b788":"#1a1a1a",border:"1px solid #333",color:copied?"#0a0a0a":"#e8e8e8",borderRadius:6,fontSize:13,fontWeight:700,fontFamily:BC,textTransform:"uppercase",letterSpacing:1,cursor:"pointer",transition:"all .2s"}}
+        onMouseEnter={e=>{if(!copied)e.currentTarget.style.borderColor="#c9a227"}}
+        onMouseLeave={e=>{if(!copied)e.currentTarget.style.borderColor="#333"}}>
+        {copied?"\u2713 Link Copied!":"Share Your Dashboard"}
+      </div>
     </div>
 
     <div className="olympiad-layout" style={{display:"flex",gap:0,maxWidth:1400,margin:"0 auto"}}>
