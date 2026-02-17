@@ -385,13 +385,13 @@ export default function App(){
             <Field label="Pres. w/ Sale" value={presSale} onChange={setPresSale}/>
           </div>
           <div style={{marginTop:10}}>
-            <Field label="Average Contract BV" value={acv} onChange={setAcv} pre="$"/>
+            <Field label="Average Weight Lift" value={acv} onChange={setAcv} pre="$"/>
           </div>
 
           <GroupLabel>Podium Thresholds</GroupLabel>
           <div style={{fontSize:12,color:"#666",marginBottom:8}}>Enter current Top 5 values from your manager</div>
           <div style={{display:"flex",gap:10,flexWrap:"wrap"}}>
-            <Field label="Top 5 Total BV" value={t5t} onChange={setT5t} pre="$"/>
+            <Field label="Top 5 Total" value={t5t} onChange={setT5t} pre="$"/>
             <Field label="Top 5 Heritage" value={t5h} onChange={setT5h} pre="$"/>
           </div>
           <div style={{marginTop:10}}>
