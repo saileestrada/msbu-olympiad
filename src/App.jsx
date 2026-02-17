@@ -257,7 +257,7 @@ export default function App(){
     <header style={{background:"#0a0a0aee",backdropFilter:"blur(14px)",borderBottom:"1px solid #1a1a1a",padding:"12px 24px",display:"flex",alignItems:"center",justifyContent:"space-between",flexWrap:"wrap",gap:10}}>
       <div style={{display:"flex",alignItems:"center",gap:12}}>
         <div style={{width:40,height:40,borderRadius:8,background:"linear-gradient(135deg,#c9a227,#8b6914)",display:"flex",alignItems:"center",justifyContent:"center",fontSize:20,fontWeight:900,fontFamily:BC,color:"#0a0a0a"}}>M</div>
-        <div><div style={{fontSize:17,fontWeight:800,fontFamily:BC,textTransform:"uppercase",letterSpacing:2}}>MSBU March Olympiad</div><div style={{fontSize:11,color:"#666",fontFamily:BC,letterSpacing:1}}>PERFORMANCE INTELLIGENCE DASHBOARD</div></div>
+        <div><div style={{fontSize:17,fontWeight:800,fontFamily:BC,textTransform:"uppercase",letterSpacing:2}}>March Olympiad</div><div style={{fontSize:11,color:"#666",fontFamily:BC,letterSpacing:1}}>PERFORMANCE INTELLIGENCE DASHBOARD</div></div>
       </div>
       <div style={{display:"flex",gap:16,alignItems:"center"}}>
         <div style={{textAlign:"center"}}><div style={{fontSize:26,fontWeight:800,fontFamily:BC,color:d2q<=3&&d2q>0?"#e74c3c":"#c9a227"}}>{d2q}</div><div style={{fontSize:9,color:"#666",fontFamily:BC,textTransform:"uppercase",letterSpacing:1}}>to Elite Qualifier</div></div>
@@ -515,7 +515,7 @@ export default function App(){
         </Sec>
 
         <div style={{textAlign:"center",padding:"20px 0 10px",borderTop:"1px solid #1a1a1a",marginTop:16}}>
-          <div style={{fontSize:10,color:"#252525",fontFamily:BC,textTransform:"uppercase",letterSpacing:2}}>MSBU March Olympiad {"\u00B7"} Performance Intelligence System {"\u00B7"} Q1 2026</div>
+          <div style={{fontSize:10,color:"#252525",fontFamily:BC,textTransform:"uppercase",letterSpacing:2}}>March Olympiad {"\u00B7"} Performance Intelligence System {"\u00B7"} Q1 2026</div>
         </div>
       </div>
     </div>
