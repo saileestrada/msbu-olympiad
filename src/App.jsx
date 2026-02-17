@@ -295,7 +295,7 @@ export default function App(){
 
         {panelOpen&&<div style={{padding:"4px 20px 24px"}}>
           <GroupLabel>Athlete</GroupLabel>
-          <TextField label="Counselor Name" value={name} onChange={setName} ph="Last, First"/>
+          <TextField label="Athlete's Name" value={name} onChange={setName} ph="Last, First"/>
 
           {/* Avatar Builder */}
           <div onClick={()=>setAvatarOpen(!avatarOpen)} style={{marginTop:10,padding:"8px 12px",background:"#111",border:"1px solid #252525",borderRadius:6,cursor:"pointer",display:"flex",alignItems:"center",justifyContent:"space-between"}}>
@@ -331,7 +331,7 @@ export default function App(){
 
           <GroupLabel>Baseline</GroupLabel>
           <div style={{display:"flex",gap:10,flexWrap:"wrap"}}>
-            <Field label="PY Baseline (Mar 2025)" value={pyBl} onChange={setPyBl} pre="$"/>
+            <Field label="PY Weight (Mar 2025)" value={pyBl} onChange={setPyBl} pre="$"/>
             <Field label="BU Median Floor" value={BU_MEDIAN} onChange={()=>{}} pre="$" locked/>
           </div>
           <div style={{fontSize:11,color:"#666",marginTop:4,fontFamily:BC}}>
@@ -349,16 +349,16 @@ export default function App(){
             </div>
           </div>
 
-          <GroupLabel>Current Production</GroupLabel>
+          <GroupLabel>Current Stats</GroupLabel>
           <div style={{display:"flex",gap:10,flexWrap:"wrap"}}>
-            <Field label="Total BV" value={totalBV} onChange={setTotalBV} pre="$"/>
-            <Field label="Large Sale BV" value={lsBV} onChange={setLsBV} pre="$"/>
+            <Field label="Total" value={totalBV} onChange={setTotalBV} pre="$"/>
+            <Field label="Max Rep (LS)" value={lsBV} onChange={setLsBV} pre="$"/>
           </div>
           <div style={{display:"flex",gap:10,flexWrap:"wrap",marginTop:10}}>
-            <Field label="Heritage BV" value={hBV} onChange={setHBV} pre="$"/>
-            <Field label="PAF Insurance BV" value={pBV} onChange={setPBV} pre="$"/>
+            <Field label="Heritage" value={hBV} onChange={setHBV} pre="$"/>
+            <Field label="PAF" value={pBV} onChange={setPBV} pre="$"/>
           </div>
-          {day>=QD&&<div style={{marginTop:10}}><Field label="BV as of Mar 20" value={bv20} onChange={setBv20} pre="$"/></div>}
+          {day>=QD&&<div style={{marginTop:10}}><Field label="Weight as of Mar 20" value={bv20} onChange={setBv20} pre="$"/></div>}
           <div style={{fontSize:13,color:"#888",marginTop:8}}>Working BV = <span style={{color:"#e8e8e8",fontWeight:700}}>{fmt(wBV)}</span></div>
 
           <div style={{display:"flex",alignItems:"center",gap:12,marginTop:14,padding:"12px 14px",background:locked110?"#1a2e1a":"#111",border:`2px solid ${locked110?"#52b78866":"#252525"}`,borderRadius:8,transition:"all .3s",cursor:"pointer"}} onClick={()=>setLocked110(!locked110)}>
@@ -425,8 +425,8 @@ export default function App(){
           <div style={{background:"#111",border:"1px solid #252525",borderRadius:10,padding:16,marginBottom:16}}>
             <Bar cur={wBV} tgt={q110} label="Progress to Elite Qualifier (110%)" color="#c9a227"/>
             <Bar cur={wBV} tgt={c120} label="Progress to Championship Qualifier (120%)" color="#52b788" marker={c120>0?q110/c120:0}/>
-            <Bar cur={tH} tgt={py>0?py*0.4:med*0.3} label="Heritage BV" color="#6c8ebf"/>
-            <Bar cur={tP} tgt={py>0?py*0.6:med*0.5} label="PAF Insurance BV" color="#b07cc6"/>
+            <Bar cur={tH} tgt={py>0?py*0.4:med*0.3} label="Heritage" color="#6c8ebf"/>
+            <Bar cur={tP} tgt={py>0?py*0.6:med*0.5} label="PAF" color="#b07cc6"/>
           </div>
           <div style={{display:"grid",gridTemplateColumns:"repeat(auto-fit,minmax(200px,1fr))",gap:10,marginBottom:16}}>
             <div style={{background:"#111",border:"1px solid #252525",borderRadius:10,padding:16,textAlign:"center"}}>
@@ -473,7 +473,7 @@ export default function App(){
             <Card label="Set Rate" value={fmtP(apptR)} sub="Appts / Activities" accent={apptR>0?"#6c8ebf":"#444"}/>
             <Card label="Hold Rate" value={fmtP(holdR)} sub="Pres. / Appts" accent={holdR>0?"#b07cc6":"#444"}/>
             <Card label="Conversion" value={fmtP(closeR)} sub="Sales / Pres." accent={closeR>0?"#e8e8e8":"#444"}/>
-            <Card label="Weekly BV" value={fmt(projW)} sub={`${nPS} sales x ${fmt(nAcv)} avg contract`} accent={projW>0?"#e8e8e8":"#444"}/>
+            <Card label="Weekly Output" value={fmt(projW)} sub={`${nPS} sales x ${fmt(nAcv)} avg contract`} accent={projW>0?"#e8e8e8":"#444"}/>
           </div>
           {projW>0&&<div style={{background:"#111",border:"1px solid #252525",borderRadius:10,padding:16}}>
             <div style={{display:"flex",gap:20,alignItems:"center",flexWrap:"wrap"}}>
