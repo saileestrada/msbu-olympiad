@@ -295,7 +295,7 @@ export default function App(){
 
         {panelOpen&&<div style={{padding:"4px 20px 24px"}}>
           <GroupLabel>Athlete</GroupLabel>
-          <TextField label="Athlete's Name" value={name} onChange={setName} ph="Last, First"/>
+          <TextField label="Name" value={name} onChange={setName} ph="First Name Only"/>
 
           {/* Avatar Builder */}
           <div onClick={()=>setAvatarOpen(!avatarOpen)} style={{marginTop:10,padding:"8px 12px",background:"#111",border:"1px solid #252525",borderRadius:6,cursor:"pointer",display:"flex",alignItems:"center",justifyContent:"space-between"}}>
@@ -385,7 +385,7 @@ export default function App(){
             <Field label="Pres. w/ Sale" value={presSale} onChange={setPresSale}/>
           </div>
           <div style={{marginTop:10}}>
-            <Field label="Average Weight Lift" value={acv} onChange={setAcv} pre="$"/>
+            <Field label="Average Weight" value={acv} onChange={setAcv} pre="$"/>
           </div>
 
           <GroupLabel>Podium Thresholds</GroupLabel>
@@ -430,7 +430,7 @@ export default function App(){
           </div>
           <div style={{display:"grid",gridTemplateColumns:"repeat(auto-fit,minmax(200px,1fr))",gap:10,marginBottom:16}}>
             <div style={{background:"#111",border:"1px solid #252525",borderRadius:10,padding:16,textAlign:"center"}}>
-              <div style={{fontSize:12,color:"#aaa",fontFamily:BC,textTransform:"uppercase",letterSpacing:1,marginBottom:4}}>Daily Avg BV</div>
+              <div style={{fontSize:12,color:"#aaa",fontFamily:BC,textTransform:"uppercase",letterSpacing:1,marginBottom:4}}>Daily Avg</div>
               <div style={{fontSize:30,fontWeight:800,fontFamily:BC}}>{fmt(dAvg)}</div>
               <div style={{fontSize:13,color:"#888"}}>per day so far</div>
             </div>
@@ -496,7 +496,7 @@ export default function App(){
           <div style={{display:"grid",gridTemplateColumns:"repeat(auto-fit,minmax(280px,1fr))",gap:12}}>
             {[{label:"Total BV",gap:gPt,cur:wBV,thresh:v5t,contracts:cPt,pres:prPt,color:"#c9a227",inP:wBV>=v5t&&v5t>0},
               {label:"Heritage",gap:gPh,cur:tH,thresh:v5h,contracts:cPh,pres:prPh,color:"#6c8ebf",inP:tH>=v5h&&v5h>0},
-              {label:"PAF Insurance",gap:gPp,cur:tP,thresh:v5p,contracts:cPp,pres:prPp,color:"#b07cc6",inP:tP>=v5p&&v5p>0}
+              {label:"PAF",gap:gPp,cur:tP,thresh:v5p,contracts:cPp,pres:prPp,color:"#b07cc6",inP:tP>=v5p&&v5p>0}
             ].map(pd=><div key={pd.label} style={{background:"#111",border:"1px solid #252525",borderRadius:10,padding:16}}>
               <div style={{fontSize:15,fontWeight:700,fontFamily:BC,textTransform:"uppercase",letterSpacing:1,color:pd.color,marginBottom:10}}>{pd.label} Podium</div>
               <div style={{display:"grid",gridTemplateColumns:"1fr auto",gap:"5px 16px",fontSize:14,fontFamily:BC,marginBottom:10}}>
