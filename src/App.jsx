@@ -425,8 +425,8 @@ export default function App(){
           <div style={{background:"#111",border:"1px solid #252525",borderRadius:10,padding:16,marginBottom:16}}>
             <Bar cur={wBV} tgt={q110} label="Progress to Elite Qualifier (110%)" color="#c9a227"/>
             <Bar cur={wBV} tgt={c120} label="Progress to Championship Qualifier (120%)" color="#52b788" marker={c120>0?q110/c120:0}/>
-            <Bar cur={tH} tgt={py>0?py*0.4:med*0.3} label="Heritage" color="#6c8ebf"/>
-            <Bar cur={tP} tgt={py>0?py*0.6:med*0.5} label="PAF" color="#b07cc6"/>
+            <Bar cur={tH} tgt={py>0?py*0.4:med*0.3} label="Heritage" color="#b07cc6"/>
+            <Bar cur={tP} tgt={py>0?py*0.6:med*0.5} label="PAF" color="#6c8ebf"/>
           </div>
           <div style={{display:"grid",gridTemplateColumns:"repeat(auto-fit,minmax(200px,1fr))",gap:10,marginBottom:16}}>
             <div style={{background:"#111",border:"1px solid #252525",borderRadius:10,padding:16,textAlign:"center"}}>
