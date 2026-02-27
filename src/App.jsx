@@ -377,7 +377,7 @@ export default function App(){
 
           <GroupLabel>Weekly Training Log</GroupLabel>
           <div style={{display:"flex",gap:10,flexWrap:"wrap"}}>
-            <Field label="Activities (Sets)" value={acts} onChange={setActs}/>
+            <Field label="Prospects" value={acts} onChange={setActs}/>
             <Field label="Appts Booked" value={appts} onChange={setAppts}/>
           </div>
           <div style={{display:"flex",gap:10,flexWrap:"wrap",marginTop:10}}>
@@ -424,8 +424,8 @@ export default function App(){
           <div style={{background:"#111",border:"1px solid #252525",borderRadius:10,padding:16,marginBottom:16}}>
             <Bar cur={wBV} tgt={q110} label="Progress to Elite Qualifier (110%)" color="#c9a227"/>
             <Bar cur={wBV} tgt={c120} label="Progress to Championship Qualifier (120%)" color="#52b788" marker={c120>0?q110/c120:0}/>
-            <Bar cur={tH} tgt={py>0?py*0.4:med*0.3} label="Heritage" color="#b07cc6"/>
-            <Bar cur={tP} tgt={py>0?py*0.6:med*0.5} label="PAF" color="#6c8ebf"/>
+            <Bar cur={tH} tgt={py>0?py*0.4:med*0.3} label="Heritage" color="#6c8ebf"/>
+            <Bar cur={tP} tgt={py>0?py*0.6:med*0.5} label="PAF" color="#b07cc6"/>
           </div>
           <div style={{display:"grid",gridTemplateColumns:"repeat(auto-fit,minmax(200px,1fr))",gap:10,marginBottom:16}}>
             <div style={{background:"#111",border:"1px solid #252525",borderRadius:10,padding:16,textAlign:"center"}}>
@@ -493,8 +493,8 @@ export default function App(){
 
         <Sec icon={"\uD83C\uDFC5"} title="Podium Push" sub="What it takes to reach Top 5">
           <div style={{display:"grid",gridTemplateColumns:"repeat(auto-fit,minmax(280px,1fr))",gap:12}}>
-            {[{label:"Heritage",gap:gPh,cur:tH,thresh:v5h,contracts:cPh,pres:prPh,color:"#6c8ebf",inP:tH>=v5h&&v5h>0},
-              {label:"PAF",gap:gPp,cur:tP,thresh:v5p,contracts:cPp,pres:prPp,color:"#b07cc6",inP:tP>=v5p&&v5p>0}
+            {[{label:"Heritage",gap:gPh,cur:tH,thresh:v5h,contracts:cPh,pres:prPh,color:"#b07cc6",inP:tH>=v5h&&v5h>0},
+              {label:"PAF",gap:gPp,cur:tP,thresh:v5p,contracts:cPp,pres:prPp,color:"#6c8ebf",inP:tP>=v5p&&v5p>0}
             ].map(pd=><div key={pd.label} style={{background:"#111",border:"1px solid #252525",borderRadius:10,padding:16}}>
               <div style={{fontSize:15,fontWeight:700,fontFamily:BC,textTransform:"uppercase",letterSpacing:1,color:pd.color,marginBottom:10}}>{pd.label} Podium</div>
               <div style={{display:"grid",gridTemplateColumns:"1fr auto",gap:"5px 16px",fontSize:14,fontFamily:BC,marginBottom:10}}>
