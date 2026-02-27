@@ -391,11 +391,10 @@ export default function App(){
           <GroupLabel>Podium Thresholds</GroupLabel>
           <div style={{fontSize:12,color:"#666",marginBottom:8}}>Enter current Top 5 values from your manager</div>
           <div style={{display:"flex",gap:10,flexWrap:"wrap"}}>
-            <Field label="Top 5 Total" value={t5t} onChange={setT5t} pre="$"/>
-            <Field label="Top 5 Heritage" value={t5h} onChange={setT5h} pre="$"/>
+            <Field label="# 5 Heritage" value={t5h} onChange={setT5h} pre="$"/>
           </div>
           <div style={{marginTop:10}}>
-            <Field label="Top 5 PAF" value={t5p} onChange={setT5p} pre="$"/>
+            <Field label="# 5 PAF" value={t5p} onChange={setT5p} pre="$"/>
           </div>
         </div>}
       </div>
@@ -494,8 +493,7 @@ export default function App(){
 
         <Sec icon={"\uD83C\uDFC5"} title="Podium Push" sub="What it takes to reach Top 5">
           <div style={{display:"grid",gridTemplateColumns:"repeat(auto-fit,minmax(280px,1fr))",gap:12}}>
-            {[{label:"Total BV",gap:gPt,cur:wBV,thresh:v5t,contracts:cPt,pres:prPt,color:"#c9a227",inP:wBV>=v5t&&v5t>0},
-              {label:"Heritage",gap:gPh,cur:tH,thresh:v5h,contracts:cPh,pres:prPh,color:"#6c8ebf",inP:tH>=v5h&&v5h>0},
+            {[{label:"Heritage",gap:gPh,cur:tH,thresh:v5h,contracts:cPh,pres:prPh,color:"#6c8ebf",inP:tH>=v5h&&v5h>0},
               {label:"PAF",gap:gPp,cur:tP,thresh:v5p,contracts:cPp,pres:prPp,color:"#b07cc6",inP:tP>=v5p&&v5p>0}
             ].map(pd=><div key={pd.label} style={{background:"#111",border:"1px solid #252525",borderRadius:10,padding:16}}>
               <div style={{fontSize:15,fontWeight:700,fontFamily:BC,textTransform:"uppercase",letterSpacing:1,color:pd.color,marginBottom:10}}>{pd.label} Podium</div>
